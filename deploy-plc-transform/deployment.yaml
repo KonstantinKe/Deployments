@@ -47,6 +47,16 @@ spec:
         volumeMounts:
           - name: gateway-config
             mountPath: /app/resources
+      - name: fusionscriptservice
+        image: docker.io/ibn40/fusionscriptservice:latest
+        env:
+          - name: FUSION_PORT
+            value: "8080"
+        resources:
+          limits:
+        volumeMounts:
+          - name: scriptservice-config
+            mountPath: /app/resources
       - name: fusionplcdataservice
         image: docker.io/ibn40/fusionplcdataservice:modbusv9.0
         volumeMounts:
