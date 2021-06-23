@@ -51,7 +51,7 @@ spec:
         image: docker.io/ibn40/fusionscriptservice:latest
         env:
           - name: FUSION_PORT
-            value: "8080"
+            value: "8082"
         resources:
           limits:
       - name: fusionplcdataservice
