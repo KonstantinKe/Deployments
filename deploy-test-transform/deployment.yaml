@@ -39,7 +39,7 @@ spec:
         image: docker.io/oisp/oisp-iot-agent:v2.1.3
         imagePullPolicy: Always
       - name: fusiongatewayapp
-        image: docker.io/ibn40/fusiongatewayapp:latest
+        image: docker.io/ibn40/fusiongatewayapp:v0.3
         env:
           - name: server.port
             value: "8081"
@@ -48,6 +48,7 @@ spec:
         volumeMounts:
           - name: gateway-config
             mountPath: /app/resources
+        imagePullPolicy: Always
       - name: fusionscriptservice
         image: docker.io/ibn40/fusionscriptservice:latest
         env:
