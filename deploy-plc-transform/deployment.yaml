@@ -54,15 +54,16 @@ spec:
             value: "8082"
         resources:
           limits:
-      - name: fusionplcdataservice
-        image: docker.io/ibn40/fusionplcdataservice:modbusv9.0
+      - name: fusionmqttdataservice
+        image: docker.io/ibn40/fusiongatewayapp:mqttv0.3 
+        imagePullPolicy: Always
         volumeMounts:
-          - name: dataservice-config
-            mountPath: /app/resources	
+          - name: mqttservice-config
+            mountPath: /app/resources
       volumes:
         - name: oisp-devices-config-volume
           configMap:
-            name: global-devices-config
+            name: <APPLICATIONNAME>-global-devices-config
             items:
             - key: config.json
               path: config.json
@@ -72,12 +73,12 @@ spec:
             items:
             - key: application.yaml
               path: application.yaml
-        - name: dataservice-config
+        - name: mqttservice-config
           configMap:
             name: <APPLICATIONNAME>-app-config
             items:
-            - key: fusionplcdataservice_application.yaml
-              path: application.yaml	      
+            - key: fusionmqttdataservice_application.yaml
+              path: application.yaml	  
         - name: oisp-devices-data-volume
           persistentVolumeClaim:
             claimName: <APPLICATIONNAME>-pvc-device-data
