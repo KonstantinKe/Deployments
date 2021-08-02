@@ -39,10 +39,7 @@ spec:
         image: docker.io/oisp/oisp-iot-agent:v2.1.3
         imagePullPolicy: Always
       - name: fusiongatewayapp
-        image: docker.io/ibn40/fusiongatewayapp:v0.3
-        env:
-          - name: server.port
-            value: "8081"
+        image: docker.io/ibn40/fusiongatewayapp-new:latest
         resources:
           limits:
         volumeMounts:
@@ -50,14 +47,22 @@ spec:
             mountPath: /app/resources
         imagePullPolicy: Always
       - name: fusionscriptservice
-        image: docker.io/ibn40/fusionscriptservice:latest
+        image: docker.io/ibn40/fusionscriptservice-new:latest
         env:
           - name: FUSION_PORT
-            value: "8082"
+            value: "8080"
+          - name: FUSION_DOWNSTREAM_URL
+            value: "http://gatewayapp:8080/"
+          - name: FUSION_PORT
+            value: "gatewayapp"
         resources:
           limits:
+        volumeMounts:
+          - name: scriptservice-config
+            mountPath: /app/resources
+        imagePullPolicy: Always
       - name: fusionmqttdataservice
-        image: docker.io/ibn40/fusiongatewayapp:mqttv0.3 
+        image: docker.io/ibn40/fusionmqttdataservice-new:latest
         imagePullPolicy: Always
         volumeMounts:
           - name: mqttservice-config
@@ -80,7 +85,13 @@ spec:
             name: <APPLICATIONNAME>-app-config
             items:
             - key: fusionmqttdataservice_application.yaml
-              path: application.yaml	  
+              path: application.yaml
+        - name: scriptservice-config
+          configMap:
+            name: <APPLICATIONNAME>-app-config
+            items:
+            - key: fusionscriptservice_application.yaml
+              path: application.yaml
         - name: oisp-devices-data-volume
           persistentVolumeClaim:
             claimName: <APPLICATIONNAME>-pvc-device-data
