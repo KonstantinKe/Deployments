@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: /snap/kompose/19/kompose-linux-amd64 convert
+    kompose.version: 1.21.0 (992df58d8)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: scriptservice
+  name: scriptservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: scriptservice
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: /snap/kompose/19/kompose-linux-amd64 convert
+        kompose.version: 1.21.0 (992df58d8)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: scriptservice
+    spec:
+      containers:
+      - env:
+        - name: FUSION_DOWNSTREAM_HOST
+          value: gatewayapp
+        - name: FUSION_DOWNSTREAM_URL
+          value: http://gatewayapp:8080/
+        - name: FUSION_PORT
+          value: "8080"
+        image: fusionscriptservice
+        imagePullPolicy: ""
+        name: scriptservice
+        ports:
+        - containerPort: 8080
+        resources: {}
+        volumeMounts:
+        - mountPath: /deno-dir/transform.ts
+          name: scriptservice-claim0
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes:
+      - name: scriptservice-claim0
+        persistentVolumeClaim:
+          claimName: scriptservice-claim0
+status: {}
