@@ -90,8 +90,8 @@ spec:
           configMap:
             name: <APPLICATIONNAME>-app-config
             items:
-            - key: fusionscriptservice_application.yaml
-              path: application.yaml
+            - key: fusionscriptservice_application.ts
+              path: transform.ts
         - name: oisp-devices-data-volume
           persistentVolumeClaim:
             claimName: <APPLICATIONNAME>-pvc-device-data
