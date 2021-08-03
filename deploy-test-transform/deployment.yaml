@@ -55,8 +55,6 @@ spec:
             value: "http://gatewayapp:8080/"
           - name: FUSION_PORT
             value: "gatewayapp"
-        resources:
-          limits:
         imagePullPolicy: Always
       - name: fusionmqttdataservice
         image: docker.io/ibn40/fusionmqttdataservice-new:latest
