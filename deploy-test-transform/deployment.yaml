@@ -44,7 +44,7 @@ spec:
           limits:
         volumeMounts:
           - name: gateway-config
-            mountPath: /app/resources
+            mountPath: /app/resources/application.yaml
         imagePullPolicy: Always
       - name: fusionscriptservice
         image: docker.io/ibn40/fusionscriptservice-new:latest
@@ -61,7 +61,7 @@ spec:
         imagePullPolicy: Always
         volumeMounts:
           - name: mqttservice-config
-            mountPath: /app/resources
+            mountPath: /app/resources/application.yaml
       volumes:
         - name: oisp-devices-config-volume
           configMap:
