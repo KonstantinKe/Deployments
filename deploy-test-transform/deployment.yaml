@@ -98,7 +98,7 @@ spec:
               path: application.yaml
         - name: scriptservice-script
           configMap:
-            name: <APPLICATIONNAME>-app-config
+            name: scriptservice-script
             items:
             - key: transform.ts
               path: transform.ts
