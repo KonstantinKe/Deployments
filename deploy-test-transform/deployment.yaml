@@ -96,12 +96,6 @@ spec:
             items:
             - key: fusionscriptservice_application.yaml
               path: application.yaml
-        - name: scriptservice-script
-          configMap:
-            name: <APPLICATIONNAME>-scriptservice
-            items:
-            - key: transform.ts
-              path: transform.ts
         - name: oisp-devices-data-volume
           persistentVolumeClaim:
             claimName: <APPLICATIONNAME>-pvc-device-data
