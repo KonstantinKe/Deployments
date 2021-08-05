@@ -57,6 +57,13 @@ spec:
           - name: FUSION_DOWNSTREAM_HOST
             value: "gatewayapp"
         imagePullPolicy: Always
+        volumeMounts:
+          - name: scriptservice-config
+            mountPath: /app/resources/application.yaml
+            subPath: application.yaml
+          - name: scriptservice-script
+            mountPath: /deno-dir/transform.ts
+            subPath: transform.ts
       - name: fusionmqttdataservice
         image: docker.io/ibn40/fusionmqttdataservice-new:latest
         imagePullPolicy: Always
