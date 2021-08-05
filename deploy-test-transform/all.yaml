@@ -1,0 +1,198 @@
+apiVersion: v1
+data:
+  transform.ts: |
+    import { isObject, TransformResult, JSONRoot, JSONObject, isNumber } from "./util.ts"
+    export function transform(data: JSONRoot): TransformResult {
+        if (!isObject(data)) {
+            return { status: 400, statusText: "Only JSON objects supported" };
+        }
+        const objectData = data as JSONObject;
+    
+        if ('temperature' in objectData) {
+            if (!isNumber(objectData['temperature'])) {
+                return { status: 400, statusText: "temperature not a number " + objectData['temperature'] };
+            }
+            const temperature = objectData['temperature'] as number;
+            objectData['temperature'] = temperature / 100;
+        }
+
+        if ('noise' in objectData) {
+            if (!isNumber(objectData['noise'])) {
+                return { status: 400, statusText: "noise not a number " + objectData['noise'] };
+            }
+            const noise = objectData['noise'] as number;
+            objectData['noise'] = 768;
+        }
+        return { status: 201, data: objectData };
+    }
+  application.yaml: |
+    server:
+      error:
+        include-stacktrace: never
+      port: 8086
+    spring:
+      task:
+        scheduling:
+          pool:
+            size: 25
+    
+    fusiongateway:
+      name: My PLC
+      oispPort: 41234
+      oispHost: localhost
+      jobSpecs:
+        transform:
+          fields:
+          - source: "dust"
+            target: "dust"
+            componentType: "dust.v1.0"
+          - source: "temperature"
+            target: "temperature"
+            componentType: "temperature.v1.0"
+          - source: "noise"
+            target: "noise"
+            componentType: "noise.v1.0"
+          - source: "humidity"
+            target: "humidity"
+            componentType: "humidity.v1.0"
+
+  fusionmqttdataservice_application.yaml: |
+    fusiondataservice:
+      name: My MQTT Service
+      connectionString: tcp://192.168.49.69:1883
+      downstreamServiceBaseUrl: http://localhost:8085/
+      dataServiceType: PUSH
+      autorun: true
+      jobSpecs:
+        transform:
+          fields:
+            - source: "airtracker-39B58/dust:$"
+              target: "dust"
+            - source: "airtracker-39B58/temperature:$"
+              target: "temperature"
+            - source: "airtracker-39B58/noise:$"
+              target: "noise"
+            - source: "airtracker-39B58/humidity:$"
+              target: "humidity"
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: transform-airtracker-app-config
+  namespace: oisp-devices
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: transform-airtracker-pvc-device-data
+  namespace: oisp-devices
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 1Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  transform-airtracker
+  namespace: oisp-devices
+  labels:
+    app: transform-airtracker-oisp-testsensor-sensor
+spec:
+  selector:
+    matchLabels:
+      app: transform-airtracker-oisp-testsensor-sensor
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: transform-airtracker-oisp-testsensor-sensor
+    spec:
+      containers:
+      - name: busybox
+        image: docker.io/busybox:latest
+        imagePullPolicy: Always
+        command: ["sleep"]
+        args: ["100000000"]
+      - name: oisp-iot-agent
+        env:
+          - name: OISP_DEVICE_ID
+            value: "transform-airtracker"
+          - name: OISP_DEVICE_ACTIVATION_CODE
+            valueFrom:
+              secretKeyRef:
+                name: global-devices-secret
+                key: activation-code
+        volumeMounts:
+          - name: oisp-devices-config-volume
+            mountPath: /volume/config
+          - name: oisp-devices-data-volume
+            mountPath: /volume/data
+        image: docker.io/oisp/oisp-iot-agent:v2.1.3
+        imagePullPolicy: Always
+      - name: fusiongatewayapp
+        image: docker.io/ibn40/fusiongatewayapp-new:latest
+        resources:
+          limits:
+        volumeMounts:
+          - name: gateway-config
+            mountPath: /app/resources/application.yaml
+            subPath: application.yaml
+        imagePullPolicy: Always
+      - name: fusionscriptservice
+        image: docker.io/ibn40/fusionscriptservice-new:latest
+        env:
+          - name: FUSION_PORT
+            value: "8085"
+          - name: FUSION_DOWNSTREAM_URL
+            value: "http://localhost:8086/"
+          - name: FUSION_DOWNSTREAM_HOST
+            value: "localhost"
+        imagePullPolicy: Always
+        volumeMounts:
+          - name: scriptservice-script
+            mountPath: /deno-dir/transform.ts
+            subPath: transform.ts
+      - name: fusionmqttdataservice
+        image: docker.io/ibn40/fusionmqttdataservice-new:latest
+        imagePullPolicy: Always
+        volumeMounts:
+          - name: mqttservice-config
+            mountPath: /app/resources/application.yaml
+            subPath: application.yaml
+      volumes:
+        - name: oisp-devices-config-volume
+          configMap:
+            name: global-devices-config
+            items:
+            - key: config.json
+              path: config.json
+        - name: gateway-config
+          configMap:
+            name: transform-airtracker-app-config
+            items:
+            - key: application.yaml
+              path: application.yaml
+        - name: mqttservice-config
+          configMap:
+            name: transform-airtracker-app-config
+            items:
+            - key: fusionmqttdataservice_application.yaml
+              path: application.yaml
+        - name: scriptservice-script
+          configMap:
+            name: transform-airtracker-app-config
+            items:
+            - key: transform.ts
+              path: transform.ts
+        - name: oisp-devices-data-volume
+          persistentVolumeClaim:
+            claimName: transform-airtracker-pvc-device-data
+      imagePullSecrets:
+      - name: regcred
+      nodeSelector:
+        kubernetes.io/hostname: tkgw00

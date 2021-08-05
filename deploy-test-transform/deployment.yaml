@@ -53,14 +53,14 @@ spec:
           - name: FUSION_PORT
             value: "8085"
           - name: FUSION_DOWNSTREAM_URL
-            value: "http://gatewayapp:8080/"
+            value: "http://localhost:8086/"
           - name: FUSION_DOWNSTREAM_HOST
-            value: "gatewayapp"
+            value: "localhost"
         imagePullPolicy: Always
-        # volumeMounts:
-        #   - name: scriptservice-config
-        #     mountPath: /app/resources/application.yaml
-        #     subPath: application.yaml
+        volumeMounts:
+          - name: scriptservice-script
+            mountPath: /deno-dir/transform.ts
+            subPath: transform.ts
       - name: fusionmqttdataservice
         image: docker.io/ibn40/fusionmqttdataservice-new:latest
         imagePullPolicy: Always
@@ -87,6 +87,12 @@ spec:
             items:
             - key: fusionmqttdataservice_application.yaml
               path: application.yaml
+        - name: scriptservice-script
+          configMap:
+            name: <APPLICATIONNAME>-app-config
+            items:
+            - key: transform.ts
+              path: transform.ts
         - name: oisp-devices-data-volume
           persistentVolumeClaim:
             claimName: <APPLICATIONNAME>-pvc-device-data
