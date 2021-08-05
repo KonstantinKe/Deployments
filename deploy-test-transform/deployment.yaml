@@ -83,13 +83,13 @@ spec:
               path: application.yaml
         - name: mqttservice-config
           configMap:
-            name: <APPLICATIONNAME>-app-config
+            name: <APPLICATIONNAME>-app-config2
             items:
             - key: fusionmqttdataservice_application.yaml
               path: application.yaml
         - name: scriptservice-config
           configMap:
-            name: <APPLICATIONNAME>-app-config2
+            name: <APPLICATIONNAME>-app-config3
             items:
             - key: fusionscriptservice_application.yaml
               path: application.yaml
