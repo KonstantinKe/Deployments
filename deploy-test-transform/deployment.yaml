@@ -57,10 +57,10 @@ spec:
           - name: FUSION_DOWNSTREAM_HOST
             value: "gatewayapp"
         imagePullPolicy: Always
-        volumeMounts:
-          - name: scriptservice-config
-            mountPath: /app/resources/application.yaml
-            subPath: application.yaml
+        # volumeMounts:
+        #   - name: scriptservice-config
+        #     mountPath: /app/resources/application.yaml
+        #     subPath: application.yaml
       - name: fusionmqttdataservice
         image: docker.io/ibn40/fusionmqttdataservice-new:latest
         imagePullPolicy: Always
@@ -83,15 +83,9 @@ spec:
               path: application.yaml
         - name: mqttservice-config
           configMap:
-            name: <APPLICATIONNAME>-app-config2
+            name: <APPLICATIONNAME>-app-config
             items:
             - key: fusionmqttdataservice_application.yaml
-              path: application.yaml
-        - name: scriptservice-config
-          configMap:
-            name: <APPLICATIONNAME>-app-config3
-            items:
-            - key: fusionscriptservice_application.yaml
               path: application.yaml
         - name: oisp-devices-data-volume
           persistentVolumeClaim:
