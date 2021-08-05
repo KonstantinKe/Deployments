@@ -51,7 +51,7 @@ spec:
         image: docker.io/ibn40/fusionscriptservice-new:latest
         env:
           - name: FUSION_PORT
-            value: "8080"
+            value: "8085"
           - name: FUSION_DOWNSTREAM_URL
             value: "http://gatewayapp:8080/"
           - name: FUSION_DOWNSTREAM_HOST
