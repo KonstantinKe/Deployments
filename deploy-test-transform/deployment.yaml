@@ -61,9 +61,6 @@ spec:
           - name: scriptservice-config
             mountPath: /app/resources/application.yaml
             subPath: application.yaml
-          - name: scriptservice-script
-            mountPath: /deno-dir/transform.ts
-            subPath: transform.ts
       - name: fusionmqttdataservice
         image: docker.io/ibn40/fusionmqttdataservice-new:latest
         imagePullPolicy: Always
@@ -96,12 +93,6 @@ spec:
             items:
             - key: fusionscriptservice_application.yaml
               path: application.yaml
-        - name: scriptservice-script
-          configMap:
-            name: scriptservice-script
-            items:
-            - key: transform.ts
-              path: transform.ts
         - name: oisp-devices-data-volume
           persistentVolumeClaim:
             claimName: <APPLICATIONNAME>-pvc-device-data
