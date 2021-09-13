@@ -61,6 +61,11 @@ spec:
         #   - name: scriptservice-script
         #     mountPath: /deno-dir/transform.ts
         #     subPath: transform.ts
+        resources:
+          requests:
+            memory: "32Mi"
+          limits:
+            memory: "128Mi"
       - name: fusionplcdataservice
         image: docker.io/ibn40/fusionplcdataservice-new:latest
         imagePullPolicy: Always
