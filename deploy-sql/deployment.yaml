@@ -29,7 +29,7 @@ spec:
           - name: OISP_DEVICE_ACTIVATION_CODE
             valueFrom:
               secretKeyRef:
-                name: <APPLICATIONNAME>-global-devices-secret
+                name: global-devices-secret
                 key: activation-code
         volumeMounts:
           - name: oisp-devices-config-volume
