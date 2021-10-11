@@ -56,7 +56,7 @@ spec:
       volumes:
         - name: oisp-devices-config-volume
           configMap:
-            name: <APPLICATIONNAME>-global-devices-config
+            name: global-devices-config
             items:
             - key: config.json
               path: config.json
