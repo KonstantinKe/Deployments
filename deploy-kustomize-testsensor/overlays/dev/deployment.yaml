@@ -4,22 +4,18 @@ metadata:
   name:  <APPLICATIONNAME>
   namespace: <NAMESPACE>
   labels:
-    app: oisp-testsensor-sensor
+    app: <APPLICATIONNAME>-oisp-testsensor-sensor
 spec:
   selector:
     matchLabels:
-      app: oisp-testsensor-sensor
+      app: <APPLICATIONNAME>-oisp-testsensor-sensor
   strategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        app: oisp-testsensor-sensor
+        app: <APPLICATIONNAME>-oisp-testsensor-sensor
     spec:
-      securityContext:
-        runAsUser: 1001
-        runAsGroup: 1001
-        fsGroup: 1001
       containers:
       - name: oisp-iot-agent
         env:
@@ -36,10 +32,10 @@ spec:
           - name: oisp-devices-data-volume
             mountPath: /volume/data
         image: docker.io/ibn40/oisp-iot-agent:v2.3.0
-        imagePullPolicy: Always        
+        imagePullPolicy: Always
       - name: oisp-testsensor
         image: docker.io/ibn40/oisp-testsensor:latest
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         env:
           - name: LOG_LEVEL
             value: "verbose"
@@ -47,7 +43,10 @@ spec:
           - name: testsensor-config
             mountPath: /etc/oisp
         resources:
-          limits:
+           requests:
+              memory: "32Mi"
+           limits:
+              memory: "128Mi"
       volumes:
         - name: oisp-devices-config-volume
           configMap:
